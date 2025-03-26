@@ -5,6 +5,7 @@
   "main": "src/index.js",
   "scripts": {
     "start": "node scripts/run.js",
+    "dev": "node scripts/run.js",
     "test": "jest",
     "analyze": "node scripts/analyze.js"
   },

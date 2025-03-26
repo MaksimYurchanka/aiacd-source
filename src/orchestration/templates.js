@@ -110,23 +110,34 @@ Output:
   }
 
   /**
-   * Get available template types for Claude Sonnet
+   * Get available template types for a specific tool
+   * @param {string} tool - The tool name (e.g., 'claudeSonnet')
    * @returns {string[]} Available template types
    */
-  getTemplateTypes() {
-    return Object.keys(this.templates.claudeSonnet);
+  getTemplateTypes(tool = 'claudeSonnet') {
+    if (!this.templates[tool]) {
+      logger.warn(`Tool not found: ${tool}`);
+      return [];
+    }
+    return Object.keys(this.templates[tool]);
   }
 
   /**
-   * Get a template based on type and task details
+   * Get a template based on tool, type, and task details
+   * @param {string} tool - The tool name (e.g., 'claudeSonnet')
    * @param {string} type - The template type
    * @param {Object} task - The task details
    * @returns {string|null} Filled template or null if not found
    */
-  getTemplate(type, task) {
-    const template = this.templates.claudeSonnet[type];
+  getTemplate(tool = 'claudeSonnet', type, task) {
+    if (!this.templates[tool]) {
+      logger.warn(`Tool not found: ${tool}`);
+      return null;
+    }
+
+    const template = this.templates[tool][type];
     if (!template) {
-      logger.warn(`Template type not found: ${type}`);
+      logger.warn(`Template type not found: ${type} for tool: ${tool}`);
       return null;
     }
 
@@ -146,11 +157,17 @@ Output:
   }
 
   /**
-   * Get the most appropriate template type for a task
+   * Get the most appropriate template type for a task and tool
+   * @param {string} tool - The tool name (e.g., 'claudeSonnet')
    * @param {Object} task - The task details
-   * @returns {string} Best template type
+   * @returns {string|null} Best template type or null if tool not found
    */
-  getBestTemplateType(task) {
+  getBestTemplateType(tool = 'claudeSonnet', task) {
+    if (!this.templates[tool]) {
+      logger.warn(`Tool not found: ${tool}`);
+      return null;
+    }
+
     const type = task.type?.toLowerCase();
     const description = task.description?.toLowerCase() || '';
     
@@ -176,12 +193,22 @@ Output:
 
   /**
    * Generate a token-optimized task template
+   * @param {string} tool - The tool name (e.g., 'claudeSonnet')
    * @param {Object} task - The task details
-   * @returns {string} The filled template
+   * @returns {string|null} The filled template or null if tool not found
    */
-  generateTemplate(task) {
-    const templateType = this.getBestTemplateType(task);
-    return this.getTemplate(templateType, task);
+  generateTemplate(tool = 'claudeSonnet', task) {
+    if (!this.templates[tool]) {
+      logger.warn(`Tool not found: ${tool}`);
+      return null;
+    }
+
+    const templateType = this.getBestTemplateType(tool, task);
+    if (!templateType) {
+      return null;
+    }
+
+    return this.getTemplate(tool, templateType, task);
   }
 }
 
