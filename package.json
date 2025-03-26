@@ -1,0 +1,28 @@
+{
+  "name": "ai-autocoding-dao",
+  "version": "1.0.0",
+  "description": "AI-AutoCoding-DAO for optimizing AI-assisted development",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node scripts/run.js",
+    "test": "jest",
+    "example:login": "node examples/task-1/run.js",
+    "example:dashboard": "node examples/task-2/run.js",
+    "analyze": "node scripts/analyze.js"
+  },
+  "keywords": [
+    "ai",
+    "development",
+    "optimization",
+    "token-efficiency",
+    "code-generation"
+  ],
+  "author": "AIACD Community",
+  "license": "MIT",
+  "dependencies": {
+    "dotenv": "^16.0.3"
+  },
+  "devDependencies": {
+    "jest": "^29.5.0"
+  }
+}

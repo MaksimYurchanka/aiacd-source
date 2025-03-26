@@ -1,0 +1,16 @@
+1. src/orchestration/selector.js - From "tool-selector" artifact
+2. src/orchestration/analyzer.js - From "task-analyzer" artifact
+3. src/orchestration/token-tracker.js - From "token-tracker" artifact
+4. src/orchestration/templates.js - From "templates" artifact
+5. src/tools/claude-direct.js - From "tool-connector" artifact
+6. src/evaluation/quality-analyzer.js - From "evaluation-framework" artifact
+7. src/evaluation/comparator.js - From "comparator" artifact
+8. src/index.js - From "main-index" artifact
+9. README.md - From "readme" artifact
+10. LICENSE - From "license" artifact
+11. .github/workflows/ci.yml - From "github-workflow" artifact
+12. src/utils/logger.js - Create a basic logger implementation
+13. src/utils/validation.js - Create basic validation utilities
+14. src/data/knowledge-manager.js - Create knowledge management utilities
+15. scripts/verify-files.sh - From "verify-files" artifact
+16. scripts/github-push.sh - From "github-push" artifact
