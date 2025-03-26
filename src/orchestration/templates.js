@@ -1,49 +1,16 @@
 /**
  * AI-AutoCoding-DAO Template Manager
- * Handles task templates for Claude Sonnet integration
+ * Enhanced with specialized bolt.diy templates
  */
 const logger = require('../utils/logger');
 
 class TemplateManager {
   constructor() {
-    // Templates for Claude Sonnet
+    // Add bolt.diy specific templates
     this.templates = {
-      claudeSonnet: {
-        basic: {
-          template: `# Task Implementation Specification
-
-## Description
-{description}
-
-## Requirements
-{requirements}
-
-## Technical Details
-- Type: {type}
-- Complexity: {complexity}
-- Features: {features}
-
-## Implementation Guidelines
-- Follow clean code principles
-- Include proper error handling
-- Add comprehensive comments
-- Consider edge cases
-- Optimize for performance
-
-## Expected Output
-- Complete implementation
-- Documentation
-- Test cases
-- Error handling`,
-          defaults: {
-            requirements: '- List key requirements\n- Include acceptance criteria',
-            type: 'component',
-            complexity: 'medium',
-            features: '[]'
-          }
-        },
-        component: {
-          template: `# Component Implementation
+      boltDiy: {
+        ui: {
+          template: `# UI Component Implementation
 
 ## Component Overview
 {description}
@@ -104,6 +71,34 @@ Output:
             testing: 'Unit tests required',
             technicalContext: '- Add technical details\n- Note dependencies and requirements'
           }
+        },
+        utility: {
+          template: `# Utility Module Implementation
+
+## Module Purpose
+{description}
+
+## API Design
+{apiDesign}
+
+## Features
+{features}
+
+## Implementation Requirements
+- Error Handling: {errorHandling}
+- Performance: {performance}
+- Documentation: {documentation}
+
+## Usage Examples
+{usageExamples}`,
+          defaults: {
+            apiDesign: '- Define public API\n- Specify types and interfaces',
+            features: '- List key features\n- Note requirements',
+            errorHandling: 'Comprehensive error handling',
+            performance: 'Optimized for common cases',
+            documentation: 'JSDoc documentation required',
+            usageExamples: '- Add usage examples\n- Show common patterns'
+          }
         }
       }
     };
@@ -111,10 +106,10 @@ Output:
 
   /**
    * Get available template types for a specific tool
-   * @param {string} tool - The tool name (e.g., 'claudeSonnet')
+   * @param {string} tool - The tool name (e.g., 'boltDiy')
    * @returns {string[]} Available template types
    */
-  getTemplateTypes(tool = 'claudeSonnet') {
+  getTemplateTypes(tool = 'boltDiy') {
     if (!this.templates[tool]) {
       logger.warn(`Tool not found: ${tool}`);
       return [];
@@ -124,12 +119,12 @@ Output:
 
   /**
    * Get a template based on tool, type, and task details
-   * @param {string} tool - The tool name (e.g., 'claudeSonnet')
+   * @param {string} tool - The tool name (e.g., 'boltDiy')
    * @param {string} type - The template type
    * @param {Object} task - The task details
    * @returns {string|null} Filled template or null if not found
    */
-  getTemplate(tool = 'claudeSonnet', type, task) {
+  getTemplate(tool = 'boltDiy', type, task) {
     if (!this.templates[tool]) {
       logger.warn(`Tool not found: ${tool}`);
       return null;
@@ -158,11 +153,11 @@ Output:
 
   /**
    * Get the most appropriate template type for a task and tool
-   * @param {string} tool - The tool name (e.g., 'claudeSonnet')
+   * @param {string} tool - The tool name (e.g., 'boltDiy')
    * @param {Object} task - The task details
    * @returns {string|null} Best template type or null if tool not found
    */
-  getBestTemplateType(tool = 'claudeSonnet', task) {
+  getBestTemplateType(tool = 'boltDiy', task) {
     if (!this.templates[tool]) {
       logger.warn(`Tool not found: ${tool}`);
       return null;
@@ -176,7 +171,7 @@ Output:
         type?.includes('component') || 
         description.includes('component') ||
         description.includes('interface')) {
-      return 'component';
+      return 'ui';
     }
     
     // Function template for logic tasks
@@ -187,28 +182,16 @@ Output:
       return 'function';
     }
     
-    // Default to basic template
-    return 'basic';
-  }
-
-  /**
-   * Generate a token-optimized task template
-   * @param {string} tool - The tool name (e.g., 'claudeSonnet')
-   * @param {Object} task - The task details
-   * @returns {string|null} The filled template or null if tool not found
-   */
-  generateTemplate(tool = 'claudeSonnet', task) {
-    if (!this.templates[tool]) {
-      logger.warn(`Tool not found: ${tool}`);
-      return null;
+    // Utility template for module tasks
+    if (type?.includes('utility') ||
+        type?.includes('module') ||
+        description.includes('utility') ||
+        description.includes('module')) {
+      return 'utility';
     }
-
-    const templateType = this.getBestTemplateType(tool, task);
-    if (!templateType) {
-      return null;
-    }
-
-    return this.getTemplate(tool, templateType, task);
+    
+    // Default to function template
+    return 'function';
   }
 }
 
