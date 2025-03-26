@@ -3,6 +3,9 @@
  * Main export file for the AI-AutoCoding-DAO system
  */
 
+// Import logger
+const logger = require('./utils/logger');
+
 // Orchestration components
 const TaskAnalyzer = require('./orchestration/analyzer');
 const TokenTracker = require('./orchestration/token-tracker');
