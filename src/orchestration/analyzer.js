@@ -1,151 +1,125 @@
 /**
  * AI-AutoCoding-DAO Task Analyzer
- * Analyzes task descriptions to extract key characteristics for tool selection
+ * Analyzes tasks for optimal Claude Sonnet implementation
  */
+const logger = require('../utils/logger');
+
 class TaskAnalyzer {
   constructor() {
     // Feature detection patterns
     this.featurePatterns = {
       stateManagement: [
-        'state management', 'state', 'redux', 'context', 
-        'useState', 'useReducer', 'store'
+        'state', 'store', 'context', 'reducer',
+        'useState', 'useReducer'
       ],
       asyncOperations: [
-        'async', 'promise', 'fetch', 'api', 'http', 
-        'request', 'useEffect', 'axios'
+        'async', 'promise', 'fetch', 'api',
+        'request', 'useEffect'
       ],
       accessibility: [
-        'a11y', 'accessibility', 'wcag', 'aria', 'screen reader', 
-        'keyboard navigation', 'focus management'
-      ],
-      animations: [
-        'animation', 'transition', 'motion', 'keyframe', 
-        'transform', 'animate'
+        'a11y', 'accessibility', 'wcag', 'aria',
+        'keyboard navigation'
       ],
       validation: [
-        'validation', 'validate', 'form validation', 'input validation', 
-        'error checking', 'sanitize'
+        'validation', 'validate', 'form',
+        'input', 'sanitize'
       ],
       typescript: [
-        'typescript', 'typed', 'type-safe', 'interface', 
-        'type definition', 'generics'
-      ],
-      responsiveDesign: [
-        'responsive', 'mobile', 'tablet', 'breakpoint', 
-        'media query', 'adaptive'
-      ]
-    };
-    
-    // Component type patterns
-    this.componentPatterns = {
-      ui: [
-        'ui', 'component', 'interface', 'view', 'page', 
-        'form', 'button', 'input', 'modal', 'card'
-      ],
-      logic: [
-        'function', 'utility', 'helper', 'algorithm', 'processor',
-        'hook', 'service', 'calculation', 'transformation'
-      ],
-      design: [
-        'design', 'system', 'theme', 'style', 'pattern',
-        'visual', 'layout', 'ui kit', 'component library'
+        'typescript', 'type-safe', 'interface',
+        'type definition'
       ]
     };
 
-    // Complexity indicators
-    this.complexityIndicators = {
-      high: [
-        'complex', 'advanced', 'sophisticated', 'comprehensive',
-        'enterprise', 'large-scale', 'multi-step', 'intricate'
+    // Task type patterns
+    this.typePatterns = {
+      ui: [
+        'ui', 'component', 'interface', 'view',
+        'form', 'button', 'input'
       ],
-      low: [
-        'simple', 'basic', 'minimal', 'straightforward',
-        'small', 'single', 'elementary', 'starter'
+      logic: [
+        'function', 'utility', 'algorithm',
+        'hook', 'service', 'calculation'
       ]
     };
   }
 
   /**
-   * Analyze a task description to determine key characteristics
+   * Analyze a task for Claude Sonnet implementation
    * @param {Object} task - The task to analyze
    * @returns {Object} Analysis results
    */
   analyzeTask(task) {
-    return {
-      type: this.determineTaskType(task),
-      complexity: this.assessComplexity(task),
-      features: this.detectFeatures(task),
-      estimatedLines: this.estimateCodeLines(task),
-      tokenBudget: this.estimateTokenBudget(task)
-    };
+    try {
+      logger.info(`Analyzing task: ${task.id || 'Unknown'}`);
+
+      const analysis = {
+        type: this.determineTaskType(task),
+        complexity: this.assessComplexity(task),
+        features: this.detectFeatures(task),
+        tokenBudget: this.estimateTokenBudget(task),
+        recommendations: this.generateRecommendations(task)
+      };
+
+      logger.debug('Task analysis complete', analysis);
+      return analysis;
+    } catch (error) {
+      logger.error(`Task analysis failed: ${error.message}`);
+      throw error;
+    }
   }
 
   /**
-   * Determine the type of task (ui, logic, design)
+   * Determine the type of task
    * @param {Object} task - The task to analyze
    * @returns {string} Task type
    */
   determineTaskType(task) {
-    const description = task.description.toLowerCase();
+    const description = task.description?.toLowerCase() || '';
     
-    for (const [type, patterns] of Object.entries(this.componentPatterns)) {
+    for (const [type, patterns] of Object.entries(this.typePatterns)) {
       if (patterns.some(pattern => description.includes(pattern))) {
         return type;
       }
     }
     
-    // Default to UI if no specific type is detected
     return 'ui';
   }
 
   /**
    * Assess the complexity of the task
    * @param {Object} task - The task to analyze
-   * @returns {string} Complexity level (low, medium, high)
+   * @returns {string} Complexity level
    */
   assessComplexity(task) {
-    const description = task.description.toLowerCase();
-    
-    // Check for explicit complexity indicators
-    for (const [level, indicators] of Object.entries(this.complexityIndicators)) {
-      if (indicators.some(indicator => description.includes(indicator))) {
-        return level;
-      }
-    }
-    
-    // Calculate complexity based on features
     const features = this.detectFeatures(task);
     
-    // Scoring system for features
+    // Calculate complexity based on features
     const complexityScore = features.reduce((score, feature) => {
       switch (feature) {
         case 'stateManagement':
         case 'asyncOperations':
           return score + 2;
         case 'accessibility':
-        case 'animations':
         case 'validation':
         case 'typescript':
-        case 'responsiveDesign':
           return score + 1;
         default:
           return score;
       }
     }, 0);
     
-    // Determine complexity level based on score
     if (complexityScore <= 2) return 'low';
     if (complexityScore <= 5) return 'medium';
     return 'high';
   }
 
   /**
-   * Detect features required by the task
+   * Detect required features
    * @param {Object} task - The task to analyze
-   * @returns {string[]} Array of detected features
+   * @returns {string[]} Detected features
    */
   detectFeatures(task) {
-    const description = task.description.toLowerCase();
+    const description = task.description?.toLowerCase() || '';
     const features = [];
     
     for (const [feature, patterns] of Object.entries(this.featurePatterns)) {
@@ -158,70 +132,80 @@ class TaskAnalyzer {
   }
 
   /**
-   * Estimate the number of code lines required for the task
+   * Estimate token budget for the task
    * @param {Object} task - The task to analyze
-   * @returns {number} Estimated lines of code
+   * @returns {Object} Token budget
    */
-  estimateCodeLines(task) {
-    const type = this.determineTaskType(task);
+  estimateTokenBudget(task) {
     const complexity = this.assessComplexity(task);
-    
-    // Base lines by type
-    const baseLines = {
-      ui: 50,
-      logic: 30,
-      design: 80
-    }[type] || 40;
-    
-    // Multiplier by complexity
-    const complexityMultiplier = {
-      low: 0.7,
-      medium: 1.0,
-      high: 1.5
-    }[complexity] || 1.0;
-    
-    // Additional lines for features
     const features = this.detectFeatures(task);
-    const featureLines = features.reduce((lines, feature) => {
-      switch (feature) {
-        case 'stateManagement':
-          return lines + 20;
-        case 'asyncOperations':
-          return lines + 15;
-        case 'validation':
-          return lines + 10;
-        case 'accessibility':
-        case 'animations':
-        case 'typescript':
-        case 'responsiveDesign':
-          return lines + 5;
-        default:
-          return lines;
-      }
+    
+    // Base budget by complexity
+    const baseBudget = {
+      low: 1000,
+      medium: 2000,
+      high: 3000
+    }[complexity] || 2000;
+    
+    // Additional budget for features
+    const featureBudget = features.reduce((total, feature) => {
+      const budgets = {
+        stateManagement: 500,
+        asyncOperations: 400,
+        accessibility: 300,
+        validation: 300,
+        typescript: 200
+      };
+      return total + (budgets[feature] || 0);
     }, 0);
     
-    return Math.round((baseLines * complexityMultiplier) + featureLines);
+    const total = baseBudget + featureBudget;
+    
+    return {
+      total,
+      analysis: Math.round(total * 0.2),
+      implementation: Math.round(total * 0.6),
+      review: Math.round(total * 0.2)
+    };
   }
 
   /**
-   * Estimate token budget required for the task
+   * Generate implementation recommendations
    * @param {Object} task - The task to analyze
-   * @returns {Object} Token budget for different phases
+   * @returns {string[]} Recommendations
    */
-  estimateTokenBudget(task) {
-    const linesOfCode = this.estimateCodeLines(task);
+  generateRecommendations(task) {
+    const recommendations = [];
+    const features = this.detectFeatures(task);
+    const complexity = this.assessComplexity(task);
     
-    // Calculate token budget based on estimated lines of code
-    // Assumption: 1 line of code requires approximately 10 tokens
-    const codeTokens = linesOfCode * 10;
+    // Add general recommendations
+    recommendations.push('Use clear and descriptive variable names');
+    recommendations.push('Include comprehensive error handling');
+    recommendations.push('Add detailed comments for complex logic');
     
-    // Token budgets for different phases
-    return {
-      analysis: Math.round(codeTokens * 0.2),  // 20% for analysis
-      implementation: Math.round(codeTokens * 0.6),  // 60% for implementation
-      review: Math.round(codeTokens * 0.2),  // 20% for review
-      total: codeTokens
-    };
+    // Feature-specific recommendations
+    if (features.includes('stateManagement')) {
+      recommendations.push('Implement efficient state management patterns');
+    }
+    
+    if (features.includes('asyncOperations')) {
+      recommendations.push('Use async/await for better readability');
+      recommendations.push('Implement proper error handling for async operations');
+    }
+    
+    if (features.includes('accessibility')) {
+      recommendations.push('Follow WCAG 2.1 guidelines');
+      recommendations.push('Implement proper ARIA attributes');
+    }
+    
+    // Complexity-specific recommendations
+    if (complexity === 'high') {
+      recommendations.push('Break down complex logic into smaller functions');
+      recommendations.push('Consider implementing unit tests');
+    }
+    
+    return recommendations;
   }
 }
 
