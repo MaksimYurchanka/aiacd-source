@@ -16,19 +16,23 @@ class ClaudeSonnetConnector {
       apiKey: config.apiKey || process.env.CLAUDE_API_KEY,
       baseUrl: config.baseUrl || process.env.CLAUDE_API_URL || 'https://api.anthropic.com/v1',
       modelVersion: config.modelVersion || process.env.CLAUDE_MODEL || 'claude-3-sonnet-20240229',
+      devMode: config.devMode || process.env.NODE_ENV === 'development',
       ...config
     };
     
-    // Initialize Anthropic client
-    this.client = new Anthropic({
-      apiKey: this.config.apiKey,
-      baseURL: this.config.baseUrl
-    });
-    
-    // Validate config
-    if (!this.config.apiKey) {
-      logger.error('No API key provided for Claude Sonnet');
-      throw new Error('Claude Sonnet API key is required');
+    // Only initialize client if not in dev mode
+    if (!this.config.devMode) {
+      if (!this.config.apiKey) {
+        logger.error('No API key provided for Claude Sonnet');
+        throw new Error('Claude Sonnet API key is required in production mode');
+      }
+      
+      this.client = new Anthropic({
+        apiKey: this.config.apiKey,
+        baseURL: this.config.baseUrl
+      });
+    } else {
+      logger.info('Running Claude Sonnet connector in development mode');
     }
   }
 
@@ -47,7 +51,8 @@ class ClaudeSonnetConnector {
         'documentation'
       ],
       maxTokens: this.config.maxTokens,
-      modelVersion: this.config.modelVersion
+      modelVersion: this.config.modelVersion,
+      devMode: this.config.devMode
     };
   }
 
@@ -63,6 +68,10 @@ class ClaudeSonnetConnector {
       
       // Prepare the prompt
       const prompt = this._preparePrompt(task, template);
+      
+      if (this.config.devMode) {
+        return this._simulateImplementation(task, prompt);
+      }
       
       // Make API call
       const response = await this.client.messages.create({
@@ -100,6 +109,56 @@ class ClaudeSonnetConnector {
       logger.error(`Claude Sonnet implementation failed: ${error.message}`);
       throw error;
     }
+  }
+  
+  /**
+   * Simulate implementation for development mode
+   * @private
+   * @param {Object} task - Task details
+   * @param {string} prompt - Prepared prompt
+   * @returns {Promise<Object>} Simulated implementation results
+   */
+  async _simulateImplementation(task, prompt) {
+    // Simulate API latency
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
+    const implementation = `
+/**
+ * Development Mode Implementation
+ * Task: ${task.description}
+ */
+function developmentImplementation() {
+  console.log("This is a simulated implementation for development mode");
+  
+  // Simulated functionality based on task type
+  const features = ${JSON.stringify(task.features || [])};
+  
+  return {
+    type: "${task.type}",
+    complexity: "${task.complexity}",
+    features
+  };
+}
+
+export default developmentImplementation;
+`;
+
+    return {
+      success: true,
+      implementation,
+      tokenUsage: {
+        prompt: Math.ceil(prompt.length / 4),
+        completion: Math.ceil(implementation.length / 4),
+        total: Math.ceil((prompt.length + implementation.length) / 4)
+      },
+      metadata: {
+        tool: this.name,
+        timestamp: new Date().toISOString(),
+        taskId: task.id,
+        modelVersion: this.config.modelVersion,
+        devMode: true
+      }
+    };
   }
   
   /**

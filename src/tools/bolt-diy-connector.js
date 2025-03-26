@@ -12,13 +12,18 @@ class BoltDiyConnector {
     this.config = {
       url: config.url || process.env.BOLT_DIY_URL,
       apiKey: config.apiKey || process.env.BOLT_DIY_API_KEY,
+      devMode: config.devMode || process.env.NODE_ENV === 'development',
       ...config
     };
     
-    // Validate config
-    if (!this.config.url || !this.config.apiKey) {
+    // Only validate config if not in dev mode
+    if (!this.config.devMode && (!this.config.url || !this.config.apiKey)) {
       logger.error('Missing required bolt.diy configuration');
-      throw new Error('bolt.diy URL and API key are required');
+      throw new Error('bolt.diy URL and API key are required in production mode');
+    }
+    
+    if (this.config.devMode) {
+      logger.info('Running bolt.diy connector in development mode');
     }
   }
 
@@ -31,6 +36,10 @@ class BoltDiyConnector {
   async executeTask(task, implementation) {
     try {
       logger.info(`Executing task with bolt.diy: ${task.id}`);
+      
+      if (this.config.devMode) {
+        return this._simulateExecution(task, implementation);
+      }
       
       // Prepare the execution request
       const request = this._prepareRequest(task, implementation);
@@ -67,6 +76,37 @@ class BoltDiyConnector {
   }
   
   /**
+   * Simulate execution for development mode
+   * @private
+   * @param {Object} task - Task details
+   * @param {Object} implementation - Implementation details
+   * @returns {Promise<Object>} Simulated execution results
+   */
+  async _simulateExecution(task, implementation) {
+    // Simulate execution latency
+    await new Promise(resolve => setTimeout(resolve, 500));
+    
+    return {
+      success: true,
+      result: {
+        status: 'completed',
+        output: 'Development mode execution simulation',
+        metrics: {
+          executionTime: 500,
+          memoryUsage: 1024,
+          cpuUsage: 0.5
+        }
+      },
+      metadata: {
+        tool: this.name,
+        timestamp: new Date().toISOString(),
+        taskId: task.id,
+        devMode: true
+      }
+    };
+  }
+  
+  /**
    * Prepare request for bolt.diy
    * @private
    * @param {Object} task - Task details
@@ -97,6 +137,14 @@ class BoltDiyConnector {
    */
   async getExecutionStatus(taskId) {
     try {
+      if (this.config.devMode) {
+        return {
+          status: 'completed',
+          progress: 100,
+          timestamp: new Date().toISOString()
+        };
+      }
+      
       const response = await fetch(`${this.config.url}/status/${taskId}`, {
         headers: {
           'Authorization': `Bearer ${this.config.apiKey}`
