@@ -1,20 +1,18 @@
 # AI-AutoCoding-DAO
 
-AI-AutoCoding-DAO (AIACD) is a development optimization framework designed to maximize coding efficiency by delegating tasks to specialized AI coding tools based on their particular strengths.
-
-![AIACD Logo](docs/images/aiacd-logo.png)
+AI-AutoCoding-DAO (AIACD) is a development optimization framework designed to maximize coding efficiency using Claude Sonnet's advanced AI capabilities.
 
 ## Overview
 
-AI-AutoCoding-DAO increases development productivity through intelligent orchestration of AI coding tools. The system analyzes coding tasks, selects the optimal AI tool for implementation, tracks token usage and efficiency metrics, and continuously refines its selection algorithm through empirical analysis.
+AI-AutoCoding-DAO increases development productivity through intelligent orchestration of Claude Sonnet for code generation and analysis. The system analyzes coding tasks, optimizes prompts through templates, tracks token usage, and continuously refines its approach through empirical analysis.
 
 ### Core Features
 
-- **Intelligent Tool Selection**: Data-driven selection of the optimal AI tool for each task
-- **Token Efficiency Optimization**: Reduce token consumption by up to 70-85% through optimal delegation
+- **Intelligent Task Analysis**: Data-driven analysis of coding requirements
+- **Token Efficiency Optimization**: Reduce token consumption through optimized prompts
 - **Task Template Management**: Specialized templates to maximize information density
-- **Implementation Evaluation**: Comprehensive quality assessment of AI-generated code
-- **Continuous Improvement**: Self-optimizing system that learns from implementation results
+- **Implementation Evaluation**: Comprehensive quality assessment of generated code
+- **Continuous Improvement**: Self-optimizing system that learns from results
 
 ## Getting Started
 
@@ -40,9 +38,8 @@ Create a `.env` file in the root directory with your API keys:
 
 ```
 CLAUDE_API_KEY=your_claude_api_key
-HAIKU_API_KEY=your_haiku_api_key
-BOLT_NEW_API_KEY=your_bolt_api_key
-V0_DEV_API_KEY=your_v0_api_key
+CLAUDE_API_URL=https://api.anthropic.com/v1
+CLAUDE_MODEL=claude-3-sonnet-20240229
 ```
 
 ### Basic Usage
@@ -65,7 +62,6 @@ const task = {
 // Process the task
 async function runTask() {
   const result = await aiacd.processTask(task);
-  console.log(`Task processed with ${result.toolSelection.selectedTool}`);
   console.log(`Implementation quality: ${result.quality.overallScore}/10`);
   console.log(`Token efficiency: ${result.efficiency.efficiencyGain}`);
 }
@@ -75,29 +71,17 @@ runTask();
 
 ## System Architecture
 
-The AI-AutoCoding-DAO system follows a modular, service-oriented architecture:
+The AI-AutoCoding-DAO system follows a modular architecture:
 
-### Orchestration Layer
-- **Task Analyzer**: Processes task descriptions to determine complexity, type, and key requirements
-- **Tool Selector**: Applies the selection algorithm to choose the optimal AI tool based on task analysis
-- **Token Tracker**: Monitors token usage across direct and delegated implementations, calculating efficiency metrics
-
-### Tool Integration Layer
-- **Tool Connectors**: Interfaces with different AI coding tools (Haiku, Bolt.new, v0.dev, Claude Direct) 
-- **Template Manager**: Applies specialized templates for each tool to optimize responses
-- **Response Processor**: Standardizes outputs from different tools for consistency
+### Core Components
+- **Task Analyzer**: Processes task descriptions to determine complexity and requirements
+- **Template Manager**: Optimizes prompts for Claude Sonnet
+- **Token Tracker**: Monitors token usage and calculates efficiency metrics
 
 ### Evaluation Framework
-- **Quality Analyzer**: Assesses implementations against standardized quality metrics
-- **Implementation Comparator**: Compares solutions across different tools
-- **Metrics Collector**: Gathers performance, quality, and efficiency metrics
-
-## Examples
-
-The `examples` directory contains sample implementations for common tasks:
-
-- **Login Component**: Authentication form with validation
-- **Token Efficiency Dashboard**: Visualization component for efficiency metrics
+- **Quality Analyzer**: Assesses implementations against quality metrics
+- **Implementation Comparator**: Analyzes and compares solutions
+- **Metrics Collector**: Gathers performance and efficiency data
 
 ## Contributing
 
@@ -112,8 +96,3 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## Acknowledgments
-
-- The AI-AutoCoding-DAO project was inspired by the need for more efficient AI-assisted development
-- Special thanks to the developers of the AI tools integrated into the system

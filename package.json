@@ -1,28 +1,31 @@
 {
   "name": "ai-autocoding-dao",
   "version": "1.0.0",
-  "description": "AI-AutoCoding-DAO for optimizing AI-assisted development",
+  "description": "AI-AutoCoding-DAO for optimizing AI-assisted development with Claude Sonnet",
   "main": "src/index.js",
   "scripts": {
     "start": "node scripts/run.js",
     "test": "jest",
-    "example:login": "node examples/task-1/run.js",
-    "example:dashboard": "node examples/task-2/run.js",
     "analyze": "node scripts/analyze.js"
   },
   "keywords": [
     "ai",
     "development",
     "optimization",
-    "token-efficiency",
-    "code-generation"
+    "claude-sonnet",
+    "token-efficiency"
   ],
   "author": "AIACD Community",
   "license": "MIT",
   "dependencies": {
-    "dotenv": "^16.0.3"
+    "@anthropic-ai/sdk": "^0.10.0",
+    "dotenv": "^16.0.3",
+    "zod": "^3.22.4"
   },
   "devDependencies": {
-    "jest": "^29.5.0"
+    "jest": "^29.5.0",
+    "@types/jest": "^29.5.0",
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0"
   }
 }

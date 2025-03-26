@@ -1,0 +1,41 @@
+## AI-AutoCoding-DAO (AIACD) Project Guidelines
+
+The AI-AutoCoding-DAO is a development optimization framework that orchestrates AI-powered coding with Claude Sonnet. Focus on clean, efficient code that follows these guidelines:
+
+1. Project Focus:
+   - Purpose: Optimize AI-assisted development with Claude Sonnet
+   - Primary goal: Achieve 5-7x token efficiency improvement
+   - Key metrics: Token usage, code quality, implementation time
+
+2. Technical Standards:
+   - Language: JavaScript/TypeScript with proper typing
+   - Structure: Modular architecture with clear separation of concerns
+   - Documentation: Comprehensive JSDoc comments on all components
+   - Error handling: Robust error management throughout the codebase
+
+3. Component Guidelines:
+   - Follow clean code principles with meaningful naming
+   - Create small, focused components with single responsibilities
+   - Implement proper parameter validation and type checking
+   - Use consistent error handling patterns
+
+4. Architecture Requirements:
+   - Orchestration Layer: Components for task analysis, template management, quality assessment
+   - Implementation Layer: Integration with bolt.diy for code generation
+   - Evaluation Framework: Multi-dimensional quality analysis
+   - Token Tracking: Detailed metrics for efficiency measurement
+
+5. Code Organization:
+   - src/orchestration/ - Task analyzers, template managers, etc.
+   - src/evaluation/ - Quality assessment components
+   - src/utils/ - Shared utilities and helpers
+   - src/tools/ - Tool connectors and APIs
+
+When creating components:
+- Design for extensibility and maintainability
+- Include comprehensive error handling and logging
+- Provide detailed JSDoc documentation for all exports
+- Follow established patterns for consistency
+- Optimize for token efficiency where possible
+
+This project aims to create a production-ready framework that significantly improves AI-assisted development through intelligent orchestration, template optimization, and quality assessment. The primary focus is on maximizing the capabilities of Claude Sonnet API while minimizing token usage.
