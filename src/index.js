@@ -10,6 +10,7 @@ const logger = require('./utils/logger');
 const TaskAnalyzer = require('./orchestration/analyzer');
 const TokenTracker = require('./orchestration/token-tracker');
 const TemplateManager = require('./orchestration/templates');
+const MetricsCollector = require('./dashboard/metrics-collector');
 
 // Tool connectors
 const ClaudeSonnetConnector = require('./tools/claude-sonnet-connector');
@@ -32,6 +33,7 @@ class AIAutoCodingDAO {
     this.analyzer = new TaskAnalyzer();
     this.tokenTracker = new TokenTracker();
     this.templateManager = new TemplateManager();
+    this.metricsCollector = new MetricsCollector();
     
     // Initialize evaluation framework
     this.qualityAnalyzer = new QualityAnalyzer();
@@ -41,7 +43,13 @@ class AIAutoCodingDAO {
     this.claudeSonnet = new ClaudeSonnetConnector(config.claudeSonnet);
     this.boltDiy = new BoltDiyConnector(config.boltDiy);
     
-    logger.info('AI-AutoCoding-DAO initialized with Claude Sonnet integration');
+    // Store configuration
+    this.config = {
+      devMode: config.devMode || process.env.NODE_ENV === 'development',
+      ...config
+    };
+    
+    logger.info('AI-AutoCoding-DAO initialized');
   }
   
   /**
@@ -60,37 +68,48 @@ class AIAutoCodingDAO {
       const analysis = this.analyzer.analyzeTask(task);
       logger.info(`Task analysis complete: ${task.id}`);
       
-      // Get template for Claude Sonnet
-      const templateType = this.templateManager.getBestTemplateType('claudeSonnet', task);
-      const template = this.templateManager.getTemplate('claudeSonnet', templateType, task);
+      // Select tool and template based on mode
+      const toolName = this.config.devMode ? 'boltDiy' : 'claudeSonnet';
+      const tool = this.config.devMode ? this.boltDiy : this.claudeSonnet;
+      
+      // Get template
+      const templateType = this.templateManager.getBestTemplateType(toolName, task);
+      const template = this.templateManager.getTemplate(toolName, templateType, task);
       
       if (!template) {
-        throw new Error('Template not found for Claude Sonnet');
+        throw new Error(`Template not found for ${toolName}`);
       }
       
-      logger.info(`Using template: ${templateType}`);
+      logger.info(`Using template: ${templateType} with ${toolName}`);
       
       // Track token usage for analysis phase
       const analysisTokens = this._estimateTokens(JSON.stringify(analysis) + template);
       
-      // Implement the task using Claude Sonnet
-      logger.info(`Implementing task with Claude Sonnet`);
-      const implementation = await this.claudeSonnet.implementTask(task, template);
+      // Implement the task
+      logger.info(`Implementing task with ${toolName}`);
+      const implementation = await tool.implementTask(task, template);
       
-      // Execute implementation with bolt.diy
-      logger.info(`Executing implementation with bolt.diy`);
+      // Execute implementation
+      logger.info(`Executing implementation`);
       const execution = await this.boltDiy.executeTask(task, implementation);
       
       // Track token usage
-      this.tokenTracker.recordDelegatedCost(task.id, 'claudeSonnet', {
+      this.tokenTracker.recordDelegatedCost(task.id, toolName, {
         analysis: analysisTokens,
         delegation: implementation.tokenUsage?.prompt || 0,
         review: implementation.tokenUsage?.completion || 0,
-        timeSpent: (Date.now() - this.tokenTracker.tasks.get(task.id).startTime) / 60000 // minutes
+        timeSpent: (Date.now() - this.tokenTracker.tasks.get(task.id).startTime) / 60000
       });
       
       // Analyze implementation quality
       const quality = this.qualityAnalyzer.analyzeQuality(implementation, task);
+      
+      // Record metrics
+      this.metricsCollector.recordTaskMetrics(task, {
+        ...implementation,
+        quality,
+        success: true
+      });
       
       // Mark task as complete
       this.tokenTracker.completeTask(task.id, quality.overallScore);
@@ -113,6 +132,15 @@ class AIAutoCodingDAO {
       };
     } catch (error) {
       logger.error(`Task processing failed: ${error.message}`);
+      
+      // Record failure metrics
+      if (task.id) {
+        this.metricsCollector.recordTaskMetrics(task, {
+          success: false,
+          error: error.message
+        });
+      }
+      
       throw error;
     }
   }
@@ -132,7 +160,10 @@ class AIAutoCodingDAO {
    * @returns {Object} System statistics
    */
   getStats() {
-    return this.tokenTracker.getStats();
+    return {
+      tokenTracking: this.tokenTracker.getStats(),
+      metrics: this.metricsCollector.generateReport()
+    };
   }
   
   /**
@@ -140,7 +171,10 @@ class AIAutoCodingDAO {
    * @returns {Object} Visualization-ready data
    */
   getVisualizationData() {
-    return this.tokenTracker.getVisualizationData();
+    return {
+      tokenTracking: this.tokenTracker.getVisualizationData(),
+      metrics: this.metricsCollector.getVisualizationData()
+    };
   }
   
   /**
@@ -163,5 +197,6 @@ module.exports = {
   QualityAnalyzer,
   ImplementationComparator,
   ClaudeSonnetConnector,
-  BoltDiyConnector
+  BoltDiyConnector,
+  MetricsCollector
 };

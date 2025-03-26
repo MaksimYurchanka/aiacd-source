@@ -1,12 +1,12 @@
 /**
  * AI-AutoCoding-DAO Template Manager
- * Enhanced with specialized bolt.diy templates
+ * Enhanced with specialized bolt.diy and claudeSonnet templates
  */
 const logger = require('../utils/logger');
 
 class TemplateManager {
   constructor() {
-    // Add bolt.diy specific templates
+    // Templates for different tools
     this.templates = {
       boltDiy: {
         ui: {
@@ -98,6 +98,123 @@ Output:
             performance: 'Optimized for common cases',
             documentation: 'JSDoc documentation required',
             usageExamples: '- Add usage examples\n- Show common patterns'
+          }
+        }
+      },
+      claudeSonnet: {
+        ui: {
+          template: `# UI Component Implementation Task
+
+## Overview
+Create a UI component that implements the following requirements:
+{description}
+
+## Component Interface
+{propsInterface}
+
+## Requirements
+1. State Management
+   {stateManagement}
+
+2. Event Handling
+   {eventHandling}
+
+3. Styling
+   {styling}
+
+4. Accessibility
+   {accessibility}
+
+## Technical Details
+- Framework: {framework}
+- Dependencies: {dependencies}
+- Browser Support: {browserSupport}
+
+## Additional Notes
+{implementationNotes}
+
+Please provide a complete, production-ready implementation.`,
+          defaults: {
+            propsInterface: 'Define a TypeScript interface for component props with proper validation',
+            stateManagement: 'Implement efficient local state management',
+            eventHandling: 'Handle all relevant user interactions',
+            styling: 'Use CSS Modules with responsive design',
+            accessibility: 'Follow WCAG 2.1 guidelines',
+            framework: 'React with TypeScript',
+            dependencies: 'Minimal external dependencies',
+            browserSupport: 'Modern browsers (last 2 versions)',
+            implementationNotes: 'Focus on maintainability and performance'
+          }
+        },
+        function: {
+          template: `# Function Implementation Task
+
+## Purpose
+{description}
+
+## Function Contract
+Input Parameters:
+{inputContract}
+
+Return Value:
+{outputContract}
+
+## Implementation Requirements
+1. Error Handling
+   {errorHandling}
+
+2. Performance
+   {performance}
+
+3. Testing
+   {testing}
+
+## Context
+{technicalContext}
+
+Please provide a complete, well-tested implementation.`,
+          defaults: {
+            inputContract: 'Define parameters with TypeScript types and validation',
+            outputContract: 'Specify return type and error handling',
+            errorHandling: 'Implement comprehensive error handling',
+            performance: 'Optimize for typical use cases',
+            testing: 'Include unit tests with edge cases',
+            technicalContext: 'Consider integration with existing system'
+          }
+        },
+        utility: {
+          template: `# Utility Module Implementation Task
+
+## Module Overview
+{description}
+
+## API Specification
+{apiDesign}
+
+## Required Features
+{features}
+
+## Implementation Requirements
+1. Error Handling
+   {errorHandling}
+
+2. Performance Considerations
+   {performance}
+
+3. Documentation
+   {documentation}
+
+## Usage Guide
+{usageExamples}
+
+Please provide a complete, well-documented implementation.`,
+          defaults: {
+            apiDesign: 'Define a clean, intuitive API with TypeScript',
+            features: 'List core functionality requirements',
+            errorHandling: 'Handle all error cases gracefully',
+            performance: 'Optimize for common operations',
+            documentation: 'Include comprehensive JSDoc comments',
+            usageExamples: 'Provide clear usage examples'
           }
         }
       }
