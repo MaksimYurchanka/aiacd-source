@@ -4,7 +4,7 @@ First of all, thank you for considering contributing to AI-AutoCoding-DAO! Your 
 
 ## Code of Conduct
 
-By participating in this project, you are expected to uphold our [Code of Conduct](CODE_OF_CONDUCT.md). Please report unacceptable behavior to [project-email@example.com].
+By participating in this project, you are expected to uphold our [Code of Conduct](CODE_OF_CONDUCT.md). Please report unacceptable behavior to [aiautocoding@gmail.com].
 
 ## How Can I Contribute?
 
